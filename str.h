@@ -27,24 +27,14 @@ Fast string class.
 * Strings from ints, booleans, floats
 * Formatted char*
 */
-#define f32u unsigned float
-#define f32  signed float
-#define f64  unsigned double
-#define f64u signed   double
-
-#define i32u unsigned int
-#define i32  signed   int
-
-#define i64  unsigned long
-#define i64u signed   long
-
-#define byte unsigned char
+#define DECIMAL_PRECISION 6
 
 // longest uint32:  4294967295 (10)
 // longest  int32: -2147483648 (11)
 
 class str
 {
+	
 	public:
 		// Initialize the string to an empty string
 		str();
@@ -56,9 +46,9 @@ class str
 		str(int number);
 
 		// String from unsigned integer
-		str(unsigned int number);
+		//str(unsigned int number);
 
-
+		str(float number);
 		
 
 		// Destructor
@@ -122,6 +112,8 @@ class str
 
 		// Length of the string
 		size_t mLength;
+
+		inline size_t getBuffSize(int number);
 };
 
 

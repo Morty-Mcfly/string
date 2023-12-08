@@ -1,11 +1,9 @@
 #include "str.h"
-
+#include <limits>
 
 int main()
 {
-	str string = "test_string";
-	str string_2 = "append_string";
-
-	string.append(string_2);
-
+	str string = -35.535334f;
+	std::cout << string << "\n";
+	std::cout << string.length();
 }
