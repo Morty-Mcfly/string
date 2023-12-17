@@ -71,10 +71,10 @@ class str
 		//void replace(const str& old_string, const str& new_string);
 		
 		// Get the character at mString[index]
-		char get(long long index) const;
+		char get(size_t index) const;
 
 		// Set the character at index. Has some safety checks to update length if need be
-		void set(long long index, char newChar);
+		void set(size_t index, char newChar);
 
 		// Get the character at mString[index]
 		char operator[](long long index) const;
