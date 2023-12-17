@@ -5,6 +5,9 @@
 #include <stdexcept>
 
 #define DECIMAL_PRECISION_MULTIPLIER 1000000
+
+#define ascii_t char
+#define unicode_t wchar_t
 //#include <iostream>
 
 // This could be an issue because it might become possible to overwrite temporarily, create an unsafe string and point to it, then reset to 256.
@@ -34,11 +37,13 @@ str::str(const char* c_str)
 		// Null terminator. Might make this redundant by properly calculating buffer size and not writing \0 twice
 		newBuffer[buffer_size - 1] = 0;
 
+		
+		
+	}
 		// Point to the copy
 		mString = (char*)newBuffer;
 		mLength = buffer_size - 1;
 	}
-}
 
 str::str(int number)
 {
@@ -150,7 +155,7 @@ void str::append(str& other)
 	// Get buffer size
 	size_t buffer_size = mLength + other.mLength + 1;
 	// Make buffer
-	char* newBuffer = (char*)malloc(sizeof(char) * buffer_size);
+	char* newBuffer = (char*)realloc(sizeof(char) * buffer_size);
 
 
 	if (newBuffer && mString && other.mString)
@@ -181,7 +186,7 @@ void str::append(str& other)
 
 }
 
-char str::get(long long index) const
+char str::get(size_t index) const
 {
 	// Allow Python - like access via negative indices
 	if (index < 0) { index += mLength; }
@@ -199,18 +204,16 @@ char str::operator[](long long index) const
 	return mString[index];
 }
 
-void str::set(long long index, char newChar)
+void str::set(size_t index, char newChar)
 {
-	if (index < 0) { index += mLength; }
-	if (index < 0 || index >= mLength)
-	{
-		throw std::out_of_range("Read access violation: Index out of range");
-	}
+	index %= mLength;
 	mString[index] = newChar;
-	// If the new character is a null byte, change the cached length of the string.
+
+	// If the new character is a null byte...
 	if(!newChar)
 	{
-		mLength = (size_t)index;
+		// free the extra space ( CHANGE THIS WHEN IMPLEMENTING CAPACITY
+		mLength = index;
 	}
 }
 
@@ -247,7 +250,18 @@ size_t str::find(size_t start,  const char* sub_string) const {
 
 str str::copy()
 {
-	return str(mString);
+	str newString;
+
+	char* copy_buffer = (char*)malloc(sizeof(char) * mLength);
+	if (copy_buffer)
+	{
+		memcpy(copy_buffer, mString, sizeof(char) * mLength);
+
+		newString.mString = copy_buffer;
+		newString.mLength = mLength;
+	}
+
+	return newString;
 }
 
 inline size_t str::getBuffSize(int number)
