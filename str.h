@@ -102,7 +102,68 @@ class str
 		str copy();
 
 		// Append two strings
-		str operator+(str const& other);
+		str operator+(str const& other)
+		{
+			// NOTICE: This does not edit this string or the other string.
+
+			// Get buffer size
+			size_t buffer_size = mLength + other.mLength + 1;
+			// Make buffer
+			char* newBuffer = (char*)malloc(sizeof(char) * buffer_size);
+
+
+			if (newBuffer && mString && other.mString)
+			{
+				// copy bytes
+				memcpy(newBuffer, mString, mLength);
+				memcpy(newBuffer + (mLength * sizeof(char)), other.mString, other.mLength);
+
+				// set null byte
+				newBuffer[buffer_size - 1] = 0;
+
+				
+
+				
+			}
+			// Create a new string. The constructor isn't performance heavy
+			str out_string;
+
+			// No need to construct a str from a char*. Just construct an empty one and overwrite its length and char* instead of having to run safety checks
+			out_string.mString = newBuffer;
+			out_string.mLength = other.mLength + mLength;
+
+			// Return the cheaply constructed string.
+			return out_string;
+		}
+
+		// Append two strings
+		str operator+=(str const& other)
+		{
+			// NOTICE: This does not edit this string or the other string.
+
+			// Get buffer size
+			size_t buffer_size = mLength + other.mLength + 1;
+			// Make buffer
+			char* newBuffer = (char*)malloc(sizeof(char) * buffer_size);
+
+
+			if (newBuffer && mString && other.mString)
+			{
+				// copy bytes
+				memcpy(newBuffer, mString, mLength);
+				memcpy(newBuffer + (mLength * sizeof(char)), other.mString, other.mLength);
+
+				// set null byte
+				newBuffer[buffer_size - 1] = 0;
+
+				mString = newBuffer;
+				mLength += other.mLength;
+
+
+			}
+			
+			return *this;
+		}
 
 
 	private:
