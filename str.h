@@ -27,6 +27,7 @@ Fast string class.
 * Strings from ints, booleans, floats
 * Formatted char*
 */
+
 #define DECIMAL_PRECISION 6
 
 // longest uint32:  4294967295 (10)
@@ -174,6 +175,7 @@ class str
 		// Length of the string
 		size_t mLength;
 
+		// Helper function to get the size of a buffer just large enough to fit number, eg -325 would return 4
 		inline size_t getBuffSize(int number);
 };
 

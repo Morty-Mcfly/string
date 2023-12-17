@@ -4,6 +4,9 @@
 int main()
 {
 	str string = -35.535334f;
-	std::cout << string << "\n";
+	str name = " years old";
+	string += name;
+	std::cout << (string) << "\n";
+
 	std::cout << string.length();
 }

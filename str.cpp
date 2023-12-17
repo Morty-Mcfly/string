@@ -40,10 +40,10 @@ str::str(const char* c_str)
 		
 		
 	}
-		// Point to the copy
-		mString = (char*)newBuffer;
-		mLength = buffer_size - 1;
-	}
+	// Point to the copy
+	mString = (char*)newBuffer;
+	mLength = buffer_size - 1;
+}
 
 str::str(int number)
 {
@@ -220,8 +220,7 @@ void str::set(size_t index, char newChar)
 
 size_t str::find(const str& sub_string) const {
 	char* p = strstr(mString, sub_string.mString);
-
-	return (p != nullptr) ? static_cast<size_t>(p - mString) : std::string::npos;
+	return (p != nullptr) ? static_cast<size_t> (p - mString) : std::string::npos;
 }
 
 size_t str::find(const char* sub_string) const {
