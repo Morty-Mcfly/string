@@ -335,5 +335,6 @@ void str::replace(const str& old_sub, const str& new_sub)
 	free(mString);
 	mString = buffer;
 
+
 	
 }
