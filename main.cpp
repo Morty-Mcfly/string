@@ -3,10 +3,10 @@
 
 int main()
 {
-	str string = -35.535334f;
-	str name = " years old";
-	string += name;
-	std::cout << (string) << "\n";
+	str code = "int i = 2; int j = 32;";
+	code.replace("int", "float");
+
+	std::cout << code;
 
 	std::cout << string.length();
 }
