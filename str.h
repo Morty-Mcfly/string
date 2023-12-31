@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <iostream>
+#include "slice.h"
+
 #ifndef STRING_H
 #define STRING_H
 
@@ -26,12 +28,12 @@ Fast string class.
 * Find & replace
 * Strings from ints, booleans, floats
 * Formatted char*
+* Add templates
 */
 
 #define DECIMAL_PRECISION 6
 
-// longest uint32:  4294967295 (10)
-// longest  int32: -2147483648 (11)
+
 
 class str
 {
@@ -46,8 +48,6 @@ class str
 		// String from signed integer
 		str(int number);
 
-		// String from unsigned integer
-		//str(unsigned int number);
 
 		str(float number);
 		
@@ -64,28 +64,26 @@ class str
 		// Append the other string to the end of this one
 		void append(str& other);
 
-		// Append a char* to the end of this string safely.
-		//void append(const char* other);
+		// Number of sub_string in this string
+		size_t count(const str& sub_string);
+
+		// Replace every occurence of old with new
+		void replace(const str& old_sub, const str& new_sub);
 
 
-		// Replace up to n occurences of new_string with old_string. -1 for all
-		//void replace(const str& old_string, const str& new_string);
+		const str_slice substring(size_t start, size_t end) const
+		{
+			str_slice slice = { mString + start, end };
+			return slice;
+		}
+
 		
 		// Get the character at mString[index]
 		char get(size_t index) const;
 
 		// Set the character at index. Has some safety checks to update length if need be
 		void set(size_t index, char newChar);
-
-		// Get the character at mString[index]
-		char operator[](long long index) const;
-
-		// For std::cout-ing a string
-		friend std::ostream& operator <<(std::ostream& os, const str& string)
-		{
-			os << string.mString;
-			return os;
-		}
+		
 
 		// Find sub_string(str) in this string
 		size_t find(const str& sub_string) const;
@@ -165,7 +163,22 @@ class str
 			
 			return *this;
 		}
+		
+		// Get the character at mString[index]
+		char operator[](size_t index)// const
+		{
+			// Allow Python - like access via negative indices
+			index %= mLength;
+			return mString[index];
+		}
 
+
+		// For std::cout-ing a string
+		friend std::ostream& operator <<(std::ostream& os, const str& string)
+		{
+			os << string.mString;
+			return os;
+		}
 
 	private:
 
@@ -178,6 +191,5 @@ class str
 		// Helper function to get the size of a buffer just large enough to fit number, eg -325 would return 4
 		inline size_t getBuffSize(int number);
 };
-
 
 #endif // MYHEADER_H

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="slice.h" />
     <ClInclude Include="str.h" />
   </ItemGroup>
   <ItemGroup>

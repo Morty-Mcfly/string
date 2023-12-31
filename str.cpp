@@ -1,8 +1,11 @@
+#pragma once
+
 #include "str.h"
 #include <string>
 #include <memory> // for smart pointer
 #include <math.h>
 #include <stdexcept>
+#include "slice.h"
 
 #define DECIMAL_PRECISION_MULTIPLIER 1000000
 
@@ -13,7 +16,7 @@
 // This could be an issue because it might become possible to overwrite temporarily, create an unsafe string and point to it, then reset to 256.
 const size_t MAX_STRING_SIZE = 256;
 
-// This string is guaranteed safe because I'm the one initializing it
+// Initialize an empty string
 str::str()
 {
 	mString = (char*)"";
@@ -47,8 +50,8 @@ str::str(const char* c_str)
 
 str::str(int number)
 {
-	size_t buffSize = getBuffSize(number) + 1;
-	char* buffer = (char*)malloc(buffSize);
+	size_t buffSize = (getBuffSize(number) + 1) * sizeof(char);
+	char* buffer = (char*)malloc(buffSize * sizeof(char));
 	// set null byte
 	if(buffer)
 	{
@@ -155,7 +158,7 @@ void str::append(str& other)
 	// Get buffer size
 	size_t buffer_size = mLength + other.mLength + 1;
 	// Make buffer
-	char* newBuffer = (char*)realloc(sizeof(char) * buffer_size);
+	char* newBuffer = (char*)realloc(mString, sizeof(char) * buffer_size);
 
 
 	if (newBuffer && mString && other.mString)
@@ -189,20 +192,10 @@ void str::append(str& other)
 char str::get(size_t index) const
 {
 	// Allow Python - like access via negative indices
-	if (index < 0) { index += mLength; }
-	if (index < 0 || index > mLength)
-	{
-		throw std::out_of_range("Read access violation: Index out of range");
-	}
-	return mString[index];
-}
-
-char str::operator[](long long index) const
-{
-	// Allow Python - like access via negative indices
 	index %= mLength;
 	return mString[index];
 }
+
 
 void str::set(size_t index, char newChar)
 {
@@ -212,7 +205,7 @@ void str::set(size_t index, char newChar)
 	// If the new character is a null byte...
 	if(!newChar)
 	{
-		// free the extra space ( CHANGE THIS WHEN IMPLEMENTING CAPACITY
+		// free the extra space ( CHANGE THIS WHEN IMPLEMENTING CAPACITY )
 		mLength = index;
 	}
 }
@@ -220,7 +213,8 @@ void str::set(size_t index, char newChar)
 
 size_t str::find(const str& sub_string) const {
 	char* p = strstr(mString, sub_string.mString);
-	return (p != nullptr) ? static_cast<size_t> (p - mString) : std::string::npos;
+
+	return (p != nullptr) ? static_cast<size_t>(p - mString) : std::string::npos;
 }
 
 size_t str::find(const char* sub_string) const {
@@ -282,4 +276,64 @@ inline size_t str::getBuffSize(int number)
 		(number >= 0) +
 		sign;
 
+}
+
+size_t str::count(const str& sub_string)
+{
+	// First, get the number of occurences of old so we can calculate the size of the new buffer
+	char* position = strstr(mString, sub_string.mString);
+	if (position == nullptr)
+	{
+		return 0;
+	}
+	size_t find_count = 0;
+	while ((position < (mString + mLength)) && (position != nullptr))
+	{
+		position = strstr(position + sub_string.mLength, sub_string.mString);
+		//position += sub_string.length();
+		find_count += 1;
+	}
+	return find_count;
+	
+}
+
+void str::replace(const str& old_sub, const str& new_sub)
+{
+	// TODO:
+	// Use realloc if applicable
+	// Calculate the length of the buffer to hold the string
+	auto cnt = count(old_sub.mString);
+	size_t buffer_size = mLength + (cnt * (new_sub.mLength - old_sub.mLength));
+
+	// Create a new buffer
+	char* buffer = (char*)malloc(buffer_size + 1);
+
+	if(buffer)
+	{
+		char* read_ptr = mString;
+		char* write_ptr = buffer;
+
+		//Write up until next occurence
+		char* next_occurence = strstr(mString, old_sub.mString);
+		ptrdiff_t copy_size = next_occurence - read_ptr;
+		while (next_occurence)
+		{
+			copy_size = next_occurence - read_ptr;
+			memcpy(write_ptr, read_ptr, copy_size);
+			memcpy(write_ptr + copy_size, new_sub.mString, new_sub.mLength);
+			read_ptr += old_sub.mLength + copy_size;
+			write_ptr += new_sub.mLength + copy_size;
+			next_occurence = strstr(read_ptr, old_sub.mString);
+			//std::cout << copy_size;
+
+		}
+		copy_size = strlen(read_ptr);
+		memcpy(write_ptr, read_ptr, copy_size);
+		*(write_ptr + copy_size) = 0;
+
+	}
+	free(mString);
+	mString = buffer;
+
+	
 }

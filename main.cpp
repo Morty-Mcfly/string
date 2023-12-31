@@ -1,5 +1,6 @@
 #include "str.h"
 #include <limits>
+#include <thread>
 
 int main()
 {
@@ -8,5 +9,4 @@ int main()
 
 	std::cout << code;
 
-	std::cout << string.length();
 }
