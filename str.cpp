@@ -1,6 +1,6 @@
 #pragma once
 
-#include "str.h"
+#include "include\str.h"
 #include <string>
 #include <memory> // for smart pointer
 #include <math.h>
@@ -153,12 +153,13 @@ const char* str::c_str() const
 	return mString;
 }
 
-void str::append(str& other)
+void str::append(str other)
 {
+
 	// Get buffer size
 	size_t buffer_size = mLength + other.mLength + 1;
 	// Make buffer
-	char* newBuffer = (char*)realloc(mString, sizeof(char) * buffer_size);
+	char* newBuffer = (char*)malloc(buffer_size * sizeof(char));
 
 
 	if (newBuffer && mString && other.mString)
@@ -166,17 +167,20 @@ void str::append(str& other)
 		// copy bytes
 		memcpy(newBuffer, mString, mLength);
 		memcpy(newBuffer + (mLength * sizeof(char)), other.mString, other.mLength);
+
 		// set null byte
 		newBuffer[buffer_size - 1] = 0;
 
 		// delete the old pointer
-		delete[] mString;
+		delete []mString;
+		//free(mString);
 
 		// Point to the new buffer
 		mString = newBuffer;
 
 		// Update the length of the string
 		mLength += other.mLength;
+
 	}
 	else
 	{
@@ -185,6 +189,7 @@ void str::append(str& other)
 
 		// Set the length to zero, appropriately
 		mLength = 0;
+
 	}
 
 }
@@ -212,6 +217,7 @@ void str::set(size_t index, char newChar)
 
 
 size_t str::find(const str& sub_string) const {
+	// Re-write thie using my own code
 	char* p = strstr(mString, sub_string.mString);
 
 	return (p != nullptr) ? static_cast<size_t>(p - mString) : std::string::npos;
@@ -219,6 +225,7 @@ size_t str::find(const str& sub_string) const {
 
 size_t str::find(const char* sub_string) const {
 	char* p = strstr(mString, sub_string);
+	// Re-write thie using my own code
 
 	return (p != nullptr) ? static_cast<size_t>(p - mString) : std::string::npos;
 }
@@ -226,6 +233,7 @@ size_t str::find(const char* sub_string) const {
 size_t str::find(size_t start, const str& sub_string) const {
 
 	start %= mLength;
+	// Re-write thie using my own code
 
 	char* p = strstr(mString + start, sub_string.mString);
 
@@ -233,7 +241,7 @@ size_t str::find(size_t start, const str& sub_string) const {
 }
 
 size_t str::find(size_t start,  const char* sub_string) const {
-	
+	// Re-write thie using my own code
 	start %= mLength;
 
 	char* p = strstr(mString + start, sub_string);
@@ -302,7 +310,7 @@ void str::replace(const str& old_sub, const str& new_sub)
 	// TODO:
 	// Use realloc if applicable
 	// Calculate the length of the buffer to hold the string
-	auto cnt = count(old_sub.mString);
+	size_t cnt = count(old_sub.mString);
 	size_t buffer_size = mLength + (cnt * (new_sub.mLength - old_sub.mLength));
 
 	// Create a new buffer
@@ -324,7 +332,6 @@ void str::replace(const str& old_sub, const str& new_sub)
 			read_ptr += old_sub.mLength + copy_size;
 			write_ptr += new_sub.mLength + copy_size;
 			next_occurence = strstr(read_ptr, old_sub.mString);
-			//std::cout << copy_size;
 
 		}
 		copy_size = strlen(read_ptr);
@@ -334,7 +341,32 @@ void str::replace(const str& old_sub, const str& new_sub)
 	}
 	free(mString);
 	mString = buffer;
-
-
 	
+}
+
+size_t str::substr(const str& other)
+{
+	return 0;
+	// Find the first occurence of other in this string using SIMD instructions
+}
+
+int substr(const char* string, size_t length, const char* sub_string, size_t sub_length)
+{
+	int position = 0;
+	int char_count = 0;
+
+	for (position = 0; position < length; position++)
+	{
+		char_count = (char_count + 1) * (*(string + position) == *(sub_string + char_count));
+		//if match:
+		//	char_count++;
+		//else:
+		//	char_count=0;
+
+		if (char_count == sub_length)
+		{
+			return position - (sub_length - 1);
+		}
+	}
+	return -1;
 }
